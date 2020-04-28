@@ -1,12 +1,13 @@
-/**
- * Graph implementation by Ayaan Siddqiui
- * for a project in CS251
- * 
- * This implementation of the graph uses a map to store
- * each vertex, with insertion and lookup of at worst-case complexity O(lgN).
- * Each value in the map holds the relation to other vertices and the corresponding weights
- */
-
+//
+// Ayaan Siddiqui
+//
+// Basic graph class using adjacency matrix representation.  Currently
+// limited to a graph with at most 100 vertices.
+//
+// original author: Prof. Joe Hummel
+// U. of Illinois, Chicago
+// CS 251: Spring 2020
+//
 #pragma once
 
 #include <iostream>
@@ -16,7 +17,7 @@
 #include <map>
 
 template <typename VertexT, typename WeightT>
-class Graph
+class graph
 {
 private:
     struct VertexData
@@ -29,18 +30,18 @@ private:
     int numEdges;
 
 public:
-    Graph()
+    graph()
     {
         this->numEdges = 0;
     }
 
-    Graph(const Graph &other)
+    graph(const graph &other)
     {
         this->vertices = other.vertices;
         this->numEdges = other.numEdges;
     }
 
-    Graph &operator=(const Graph &other)
+    graph &operator=(const graph &other)
     {
         this->vertices = other.vertices;
         this->numEdges = other.numEdges;
