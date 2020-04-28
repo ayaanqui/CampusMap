@@ -32,10 +32,31 @@
 using namespace std;
 using namespace tinyxml2;
 
-void addNodesToGraph(map<long long, Coordinates> &Nodes, Graph<long long, double> &G)
+void addNodes(map<long long, Coordinates> &Nodes, graph<long long, double> &G)
 {
     for (auto node : Nodes)
         G.addVertex(node.first);
+}
+
+void addEdges(vector<FootwayInfo> &Footways, map<long long, Coordinates> &Nodes, graph<long long, double> &G)
+{
+    for (FootwayInfo &footway : Footways)
+    {
+        for (size_t i = 0; i < footway.Nodes.size() - 1; ++i)
+        {
+            auto node1 = Nodes.find(footway.Nodes[i]);
+            auto node2 = Nodes.find(footway.Nodes[i + 1]);
+
+            G.addEdge(
+                node1->first,
+                node2->first,
+                distBetween2Points(node1->second.Lat, node1->second.Lon, node2->second.Lat, node2->second.Lon));
+            G.addEdge(
+                node2->first,
+                node1->first,
+                distBetween2Points(node2->second.Lat, node2->second.Lon, node1->second.Lat, node1->second.Lon));
+        }
+    }
 }
 
 int main()
@@ -85,8 +106,9 @@ int main()
     cout << "# of footways: " << Footways.size() << endl;
     cout << "# of buildings: " << Buildings.size() << endl;
 
-    Graph<long long, double> G;
-    addNodesToGraph(Nodes, G); // Add all nodes to graph
+    graph<long long, double> G;
+    addNodes(Nodes, G); // Add all nodes to graph
+    addEdges(Footways, Nodes, G);
 
     cout << "# of vertices: " << G.NumVertices() << endl;
     cout << "# of edges: " << G.NumEdges() << endl;
