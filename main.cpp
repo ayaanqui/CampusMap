@@ -1,5 +1,3 @@
-/*main.cpp*/
-
 //
 // Prof. Joe Hummel
 // U. of Illinois, Chicago
@@ -18,7 +16,7 @@
 //
 
 #include <iostream>
-#include <iomanip> /*setprecision*/
+#include <iomanip> // setprecision
 #include <string>
 #include <vector>
 #include <map>
@@ -88,7 +86,7 @@ int main()
     cout << "# of buildings: " << Buildings.size() << endl;
 
     Graph<long long, double> G;
-    addNodesToGraph(Nodes, G);
+    addNodesToGraph(Nodes, G); // Add all nodes to graph
 
     cout << "# of vertices: " << G.NumVertices() << endl;
     cout << "# of edges: " << G.NumEdges() << endl;
