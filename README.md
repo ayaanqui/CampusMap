@@ -10,10 +10,18 @@ CampusMap is a console app that helps the user navigate UIC's campus. The projec
 git clone https://github.com/ayaanqui/CampusMap.git
 ```
 
-### Compile and run
+### Compile the project
 
 ```
 g++ -O2 -std=c++11 -Wall main.cpp dist.cpp osm.cpp tinyxml2.cpp -o program
 ```
 
-This will create a new file in your local project directory name `program.exe` or `program.out`
+This will create a new file in your local project directory, named `program`
+
+### Run program
+
+```
+./program
+```
+
+Ignore the warnings. And input `map.osm` as the file name
