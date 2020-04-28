@@ -29,6 +29,7 @@
 #include "tinyxml2.h"
 #include "dist.h"
 #include "osm.h"
+#include "Graph.h" // My graph implementation
 
 using namespace std;
 using namespace tinyxml2;
