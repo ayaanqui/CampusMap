@@ -95,7 +95,7 @@ public:
         return true;
     }
 
-    std::set<VertexT> neighbors(VertexT v)
+    std::set<VertexT> neighbors(VertexT v) const
     {
         return this->vertices.find(v)->second.neighborsV;
     }
