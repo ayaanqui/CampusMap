@@ -29,16 +29,13 @@
 #include "osm.h"
 #include "graph.h" // Graph implementation
 
-using namespace std;
-using namespace tinyxml2;
-
-void addNodes(map<long long, Coordinates> &Nodes, graph<long long, double> &G)
+void addNodes(std::map<long long, Coordinates> &Nodes, graph<long long, double> &G)
 {
     for (auto node : Nodes)
         G.addVertex(node.first);
 }
 
-void addEdges(vector<FootwayInfo> &Footways, map<long long, Coordinates> &Nodes, graph<long long, double> &G)
+void addEdges(std::vector<FootwayInfo> &Footways, std::map<long long, Coordinates> &Nodes, graph<long long, double> &G)
 {
     for (FootwayInfo &footway : Footways)
     {
@@ -61,20 +58,20 @@ void addEdges(vector<FootwayInfo> &Footways, map<long long, Coordinates> &Nodes,
 
 int main()
 {
-    map<long long, Coordinates> Nodes; // maps a Node ID to it's coordinates (lat, lon)
-    vector<FootwayInfo> Footways;      // info about each footway, in no particular order
-    vector<BuildingInfo> Buildings;    // info about each building, in no particular order
-    XMLDocument xmldoc;
+    std::map<long long, Coordinates> Nodes; // maps a Node ID to it's coordinates (lat, lon)
+    std::vector<FootwayInfo> Footways;      // info about each footway, in no particular order
+    std::vector<BuildingInfo> Buildings;    // info about each building, in no particular order
+    tinyxml2::XMLDocument xmldoc;
 
-    cout << "** Navigating UIC open street map **" << endl;
-    cout << endl;
-    cout << std::setprecision(8);
+    std::cout << "** Navigating UIC open street map **" << std::endl;
+    std::cout << endl;
+    std::cout << std::setprecision(8);
 
-    string def_filename = "map.osm";
-    string filename;
+    std::string def_filename = "map.osm";
+    std::string filename;
 
-    cout << "Enter map filename> ";
-    getline(cin, filename);
+    std::cout << "Enter map filename> ";
+    getline(std::cin, filename);
 
     if (filename == "")
         filename = def_filename;
@@ -101,29 +98,29 @@ int main()
     assert(footwayCount == Footways.size());
     assert(buildingCount == Buildings.size());
 
-    cout << endl;
-    cout << "# of nodes: " << Nodes.size() << endl;
-    cout << "# of footways: " << Footways.size() << endl;
-    cout << "# of buildings: " << Buildings.size() << endl;
+    std::cout << std::endl;
+    std::cout << "# of nodes: " << Nodes.size() << std::endl;
+    std::cout << "# of footways: " << Footways.size() << std::endl;
+    std::cout << "# of buildings: " << Buildings.size() << std::endl;
 
     graph<long long, double> G;
     addNodes(Nodes, G); // Add all nodes to graph
     addEdges(Footways, Nodes, G);
 
-    cout << "# of vertices: " << G.NumVertices() << endl;
-    cout << "# of edges: " << G.NumEdges() << endl;
-    cout << endl;
+    std::cout << "# of vertices: " << G.NumVertices() << std::endl;
+    std::cout << "# of edges: " << G.NumEdges() << std::endl;
+    std::cout << std::endl;
 
     // Navigation from building to building
-    string startBuilding, destBuilding;
+    std::string startBuilding, destBuilding;
 
-    cout << "Enter start (partial name or abbreviation), or #> ";
-    getline(cin, startBuilding);
+    std::cout << "Enter start (partial name or abbreviation), or #> ";
+    std::getline(std::cin, startBuilding);
 
     while (startBuilding != "#")
     {
-        cout << "Enter destination (partial name or abbreviation)> ";
-        getline(cin, destBuilding);
+        std::cout << "Enter destination (partial name or abbreviation)> ";
+        std::getline(cin, destBuilding);
 
         //
         // TODO: lookup buildings, find nearest start and dest nodes,
@@ -136,15 +133,15 @@ int main()
         //
         // another navigation?
         //
-        cout << endl;
-        cout << "Enter start (partial name or abbreviation), or #> ";
-        getline(cin, startBuilding);
+        std::cout << std::endl;
+        std::cout << "Enter start (partial name or abbreviation), or #> ";
+        std::getline(cin, startBuilding);
     }
 
     //
     // done:
     //
-    cout << "** Done **" << endl;
+    std::cout << "** Done **" << std::endl;
 
     return 0;
 }
