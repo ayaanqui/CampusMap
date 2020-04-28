@@ -29,15 +29,17 @@
 #include "tinyxml2.h"
 #include "dist.h"
 #include "osm.h"
-#include "Graph.h" // My graph implementation
+#include "graph.h" // Graph implementation
 
 using namespace std;
 using namespace tinyxml2;
 
-//////////////////////////////////////////////////////////////////
-//
-// main
-//
+void addNodesToGraph(map<long long, Coordinates> &Nodes, Graph<long long, double> &G)
+{
+    for (auto node : Nodes)
+        G.addVertex(node.first);
+}
+
 int main()
 {
     map<long long, Coordinates> Nodes; // maps a Node ID to it's coordinates (lat, lon)
@@ -56,13 +58,9 @@ int main()
     getline(cin, filename);
 
     if (filename == "")
-    {
         filename = def_filename;
-    }
 
-    //
     // Load XML-based map file
-    //
     if (!LoadOpenStreetMap(filename, xmldoc))
     {
         cout << "**Error: unable to load open street map." << endl;
@@ -70,24 +68,16 @@ int main()
         return 0;
     }
 
-    //
     // Read the nodes, which are the various known positions on the map:
-    //
     int nodeCount = ReadMapNodes(xmldoc, Nodes);
 
-    //
     // Read the footways, which are the walking paths:
-    //
     int footwayCount = ReadFootways(xmldoc, Footways);
 
-    //
     // Read the university buildings:
-    //
     int buildingCount = ReadUniversityBuildings(xmldoc, Nodes, Buildings);
 
-    //
     // Stats
-    //
     assert(nodeCount == Nodes.size());
     assert(footwayCount == Footways.size());
     assert(buildingCount == Buildings.size());
@@ -97,17 +87,14 @@ int main()
     cout << "# of footways: " << Footways.size() << endl;
     cout << "# of buildings: " << Buildings.size() << endl;
 
-    //
-    // TODO: build the graph, output stats:
-    //
+    Graph<long long, double> G;
+    addNodesToGraph(Nodes, G);
 
-    //cout << "# of vertices: " << G.NumVertices() << endl;
-    //cout << "# of edges: " << G.NumEdges() << endl;
+    cout << "# of vertices: " << G.NumVertices() << endl;
+    cout << "# of edges: " << G.NumEdges() << endl;
     cout << endl;
 
-    //
     // Navigation from building to building
-    //
     string startBuilding, destBuilding;
 
     cout << "Enter start (partial name or abbreviation), or #> ";
