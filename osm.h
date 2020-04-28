@@ -5,7 +5,7 @@
 // U. of Illinois, Chicago
 // CS 251: Spring 2020
 // Project #07: open street maps, graphs, and Dijkstra's alg
-// 
+//
 
 #pragma once
 
@@ -19,7 +19,6 @@
 using namespace std;
 using namespace tinyxml2;
 
-
 //
 // Coordinates:
 //
@@ -27,25 +26,24 @@ using namespace tinyxml2;
 //
 struct Coordinates
 {
-  long long ID;
-  double Lat;
-  double Lon;
+    long long ID;
+    double Lat;
+    double Lon;
 
-  Coordinates()
-  {
-    ID = 0;
-    Lat = 0.0;
-    Lon = 0.0;
-  }
+    Coordinates()
+    {
+        ID = 0;
+        Lat = 0.0;
+        Lon = 0.0;
+    }
 
-  Coordinates(long long id, double lat, double lon)
-  {
-    ID = id;
-    Lat = lat;
-    Lon = lon;
-  }
+    Coordinates(long long id, double lat, double lon)
+    {
+        ID = id;
+        Lat = lat;
+        Lon = lon;
+    }
 };
-
 
 //
 // FootwayInfo
@@ -54,26 +52,25 @@ struct Coordinates
 // the footway.  The vector defines points (Nodes) along the footway; the
 // vector always contains at least two points.
 //
-// Example: think of a footway as a sidewalk, with points n1, n2, ..., 
+// Example: think of a footway as a sidewalk, with points n1, n2, ...,
 // nx, ny.  n1 and ny denote the endpoints of the sidewalk, and the points
 // n2, ..., nx are intermediate points along the sidewalk.
 //
 struct FootwayInfo
 {
-  long long ID;
-  vector<long long> Nodes;
+    long long ID;
+    vector<long long> Nodes;
 
-  FootwayInfo()
-  {
-    ID = 0;
-  }
+    FootwayInfo()
+    {
+        ID = 0;
+    }
 
-  FootwayInfo(long long id)
-  {
-    ID = id;
-  }
+    FootwayInfo(long long id)
+    {
+        ID = id;
+    }
 };
-
 
 //
 // BuildingInfo
@@ -83,32 +80,31 @@ struct FootwayInfo
 //
 struct BuildingInfo
 {
-  string Fullname;
-  string Abbrev;
-  Coordinates Coords;
+    string Fullname;
+    string Abbrev;
+    Coordinates Coords;
 
-  BuildingInfo()
-  {
-    Fullname = "";
-    Abbrev = "";
-    Coords = Coordinates();
-  }
+    BuildingInfo()
+    {
+        Fullname = "";
+        Abbrev = "";
+        Coords = Coordinates();
+    }
 
-  BuildingInfo(string fullname, string abbrev, long long id, double lat, double lon)
-  {
-    Fullname = fullname;
-    Abbrev = abbrev;
-    Coords = Coordinates(id, lat, lon);
-  }
+    BuildingInfo(string fullname, string abbrev, long long id, double lat, double lon)
+    {
+        Fullname = fullname;
+        Abbrev = abbrev;
+        Coords = Coordinates(id, lat, lon);
+    }
 };
-
 
 //
 // Functions:
 //
-bool LoadOpenStreetMap(string filename, XMLDocument& xmldoc);
-int  ReadMapNodes(XMLDocument& xmldoc, map<long long, Coordinates>& Nodes);
-int  ReadFootways(XMLDocument& xmldoc, vector<FootwayInfo>& Footways);
-int  ReadUniversityBuildings(XMLDocument& xmldoc,
-       map<long long, Coordinates>& Nodes,
-       vector<BuildingInfo>& Buildings);
+bool LoadOpenStreetMap(string filename, XMLDocument &xmldoc);
+int ReadMapNodes(XMLDocument &xmldoc, map<long long, Coordinates> &Nodes);
+int ReadFootways(XMLDocument &xmldoc, vector<FootwayInfo> &Footways);
+int ReadUniversityBuildings(XMLDocument &xmldoc,
+                            map<long long, Coordinates> &Nodes,
+                            vector<BuildingInfo> &Buildings);
