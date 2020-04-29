@@ -152,7 +152,18 @@ bool setBuildingInfo(
             return true;
         }
         else
+        {
+            // We will search for a partial match
+            for (auto iter : buildingsFullname)
+            {
+                if (iter.first.find(query))
+                {
+                    buildingInfo = iter.second;
+                    return true;
+                }
+            }
             return false;
+        }
     }
     buildingInfo = iterAbbrev->second;
     return true;
