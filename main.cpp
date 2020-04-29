@@ -56,6 +56,25 @@ void addEdges(std::vector<FootwayInfo> &Footways, std::map<long long, Coordinate
     }
 }
 
+void addBuildings(
+    std::vector<BuildingInfo> &Buildings,
+    std::map<std::string, BuildingInfo> &buildingsAbbreviation,
+    std::map<std::string, BuildingInfo> &buildingsFullname)
+{
+    for (BuildingInfo building : Buildings)
+    {
+        buildingsAbbreviation.emplace(building.Abbrev, building);
+        buildingsFullname.emplace(building.Fullname.substr(0, building.Fullname.find('(') - 1), building);
+    }
+}
+
+std::map<std::string, BuildingInfo>::iterator findBuilding(
+    std::map<std::string, BuildingInfo> &buildings,
+    std::string query)
+{
+    return buildings.find(query);
+}
+
 int main()
 {
     std::map<long long, Coordinates> Nodes; // maps a Node ID to it's coordinates (lat, lon)
@@ -107,6 +126,9 @@ int main()
     addNodes(Nodes, G); // Add all nodes to graph
     addEdges(Footways, Nodes, G);
 
+    std::map<std::string, BuildingInfo> buildingsAbbreviation, buildingsFullname;
+    addBuildings(Buildings, buildingsAbbreviation, buildingsFullname);
+
     std::cout << "# of vertices: " << G.NumVertices() << std::endl;
     std::cout << "# of edges: " << G.NumEdges() << std::endl;
     std::cout << std::endl;
@@ -122,17 +144,28 @@ int main()
         std::cout << "Enter destination (partial name or abbreviation)> ";
         std::getline(cin, destBuilding);
 
-        //
-        // TODO: lookup buildings, find nearest start and dest nodes,
-        // run Dijkstra's alg, output distance and path to destination:
-        //
+        auto startIterAbbrev = findBuilding(buildingsAbbreviation, startBuilding);
+        auto startIterFname = findBuilding(buildingsFullname, startBuilding);
 
-        //cout << "Start building not found" << endl;
-        //cout << "Destination building not found" << endl;
+        auto destIterAbbrev = findBuilding(buildingsAbbreviation, destBuilding);
+        auto destIterFname = findBuilding(buildingsFullname, destBuilding);
 
-        //
-        // another navigation?
-        //
+        bool startFound = false;
+        bool destFound = false;
+
+        if (startIterAbbrev == buildingsAbbreviation.end() && startIterFname == buildingsFullname.end())
+            std::cout << "Start building not found" << std::endl;
+        else
+            startFound = true;
+        if (destIterAbbrev == buildingsAbbreviation.end() && destIterFname == buildingsFullname.end())
+            std::cout << "Destination building not found" << std::endl;
+        else
+            destFound = true;
+
+        if (startFound && destFound)
+            std::cout << "Let's start Dijkstra's algorithm!!" << std::endl;
+
+        // Restart...
         std::cout << std::endl;
         std::cout << "Enter start (partial name or abbreviation), or #> ";
         std::getline(cin, startBuilding);
