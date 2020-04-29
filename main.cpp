@@ -142,19 +142,19 @@ bool setBuildingInfo(
     BuildingInfo &buildingInfo,
     std::string query)
 {
-    auto startIterAbbrev = findBuilding(buildingsAbbreviation, query);
-    if (startIterAbbrev == buildingsAbbreviation.end())
+    auto iterAbbrev = findBuilding(buildingsAbbreviation, query);
+    if (iterAbbrev == buildingsAbbreviation.end())
     { // Abbreviation was not found, so we'll search for Fullname
-        auto startIterFname = findBuilding(buildingsFullname, query);
-        if (startIterFname != buildingsFullname.end())
+        auto iterFname = findBuilding(buildingsFullname, query);
+        if (iterFname != buildingsFullname.end())
         {
-            buildingInfo = startIterFname->second;
+            buildingInfo = iterFname->second;
             return true;
         }
         else
             return false;
     }
-    buildingInfo = startIterAbbrev->second;
+    buildingInfo = iterAbbrev->second;
     return true;
 }
 
