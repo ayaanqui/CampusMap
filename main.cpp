@@ -197,6 +197,18 @@ Coordinates nearestNode(
     return minDistCoord;
 }
 
+void printBuildingInfo(BuildingInfo &building)
+{
+    std::cout << " " << building.Fullname << std::endl;
+    std::cout << " (" << building.Coords.Lat << ", " << building.Coords.Lon << ")" << std::endl;
+}
+
+void printNearestNode(Coordinates &coord)
+{
+    std::cout << " " << coord.ID << std::endl;
+    std::cout << " (" << coord.Lat << ", " << coord.Lon << ")" << std::endl;
+}
+
 int main()
 {
     std::map<long long, Coordinates> Nodes; // maps a Node ID to it's coordinates (lat, lon)
@@ -279,26 +291,20 @@ int main()
         if (startFound && destFound)
         {
             std::cout << "Starting point: " << std::endl;
-            std::cout << " " << startBuildingInfo.Fullname << std::endl;
-            std::cout << " (" << startBuildingInfo.Coords.Lat << ", " << startBuildingInfo.Coords.Lon << ")" << std::endl;
-            std::cout << std::endl;
-
+            printBuildingInfo(startBuildingInfo);
             std::cout << "Destination point: " << std::endl;
-            std::cout << " " << destBuildingInfo.Fullname << std::endl;
-            std::cout << " (" << destBuildingInfo.Coords.Lat << ", " << destBuildingInfo.Coords.Lon << ")" << std::endl;
+            printBuildingInfo(destBuildingInfo);
+
             std::cout << std::endl;
 
             // Nearest nodes
-            Coordinates startCoord = nearestNode(Footways, Nodes, startBuildingInfo.Coords);
             std::cout << "Nearest start node: " << std::endl;
-            std::cout << " " << startCoord.ID << std::endl;
-            std::cout << " (" << startCoord.Lat << ", " << startCoord.Lon << ")" << std::endl;
-            std::cout << std::endl;
-
-            Coordinates destCoord = nearestNode(Footways, Nodes, destBuildingInfo.Coords);
+            Coordinates startCoord = nearestNode(Footways, Nodes, startBuildingInfo.Coords);
+            printNearestNode(startCoord);
             std::cout << "Nearest destination node: " << std::endl;
-            std::cout << " " << destCoord.ID << std::endl;
-            std::cout << " (" << destCoord.Lat << ", " << destCoord.Lon << ")" << std::endl;
+            Coordinates destCoord = nearestNode(Footways, Nodes, destBuildingInfo.Coords);
+            printNearestNode(destCoord);
+
             std::cout << std::endl;
 
             std::cout << "Dijkstra's algo features will be implemented soon..." << std::endl;
