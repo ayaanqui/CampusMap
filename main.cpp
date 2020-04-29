@@ -77,6 +77,7 @@ std::vector<long long> Dijkstra(
 
         for (auto neighbor : neighbors)
         {
+            edgeWeight = 0.0;
             G.getWeight(currentV.second, neighbor, edgeWeight);
             altPathDistance = currentV.first + edgeWeight;
 
@@ -198,13 +199,13 @@ int main()
     }
 
     // Read the nodes, which are the various known positions on the map:
-    int nodeCount = ReadMapNodes(xmldoc, Nodes);
+    size_t nodeCount = ReadMapNodes(xmldoc, Nodes);
 
     // Read the footways, which are the walking paths:
-    int footwayCount = ReadFootways(xmldoc, Footways);
+    size_t footwayCount = ReadFootways(xmldoc, Footways);
 
     // Read the university buildings:
-    int buildingCount = ReadUniversityBuildings(xmldoc, Nodes, Buildings);
+    size_t buildingCount = ReadUniversityBuildings(xmldoc, Nodes, Buildings);
 
     // Stats
     assert(nodeCount == Nodes.size());
