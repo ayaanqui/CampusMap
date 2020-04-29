@@ -20,14 +20,75 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
+#include <queue>
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
+#include <limits>
 
 #include "tinyxml2.h"
 #include "dist.h"
 #include "osm.h"
 #include "graph.h" // Graph implementation
+
+std::vector<long long> Dijkstra(
+    graph<long long, double> &G,
+    long long startV,
+    std::map<long long, double> &distances)
+{
+    const int INF = std::numeric_limits<int>::max();
+
+    std::vector<long long> visited;
+    std::set<long long> visitedSet;
+
+    std::vector<long long> graphVertices = G.getVertices();
+    std::priority_queue<
+        std::pair<double, long long>,
+        std::vector<std::pair<double, long long>>,
+        std::greater<std::pair<double, long long>>>
+        unvisitedQueue;
+
+    for (long long vertex : graphVertices)
+    {
+        unvisitedQueue.emplace((vertex == startV) ? 0 : INF, vertex);
+        distances.emplace(vertex, (vertex == startV) ? 0 : INF);
+    }
+
+    pair<double, long long> currentV;
+    double edgeWeight, altPathDistance;
+
+    while (!unvisitedQueue.empty())
+    {
+        currentV = unvisitedQueue.top();
+        unvisitedQueue.pop();
+
+        if (currentV.first == INF)
+            break;
+        else if (visitedSet.count(currentV.second) > 0)
+            continue;
+        else
+        {
+            visitedSet.emplace(currentV.second);
+            visited.push_back(currentV.second);
+        }
+
+        set<long long> neighbors = G.neighbors(currentV.second);
+
+        for (auto neighbor : neighbors)
+        {
+            G.getWeight(currentV.second, neighbor, edgeWeight);
+            altPathDistance = currentV.first + edgeWeight;
+
+            if (altPathDistance < distances.find(neighbor)->second)
+            {
+                unvisitedQueue.emplace(altPathDistance, neighbor);
+                distances[neighbor] = altPathDistance;
+            }
+        }
+    }
+    return visited;
+}
 
 void addNodes(std::map<long long, Coordinates> &Nodes, graph<long long, double> &G)
 {
