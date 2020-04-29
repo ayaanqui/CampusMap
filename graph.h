@@ -1,8 +1,9 @@
+/*graph.h*/
+
 //
 // Ayaan Siddiqui
 //
-// Basic graph class using adjacency matrix representation.  Currently
-// limited to a graph with at most 100 vertices.
+// Basic graph class using adjacency matrix representation.
 //
 // original author: Prof. Joe Hummel
 // U. of Illinois, Chicago
@@ -59,33 +60,69 @@ public:
         return this->numEdges;
     }
 
+    //
+    // addVertex
+    //
+    // Adds the vertex v to the graph if there's room, and if so
+    // returns true.  If the vertex already
+    // exists in the graph, then false is returned.
+    //
     bool addVertex(VertexT v)
     {
-        if (this->vertices.count(v) > 0)
+        if (this->vertices.find(v) != this->vertices.end())
             return false;
 
         this->vertices.emplace(v, VertexData{});
         return true;
     }
 
+    //
+    // addEdge
+    //
+    // Adds the edge (from, to, weight) to the graph, and returns
+    // true.  If the vertices do not exist, false is returned.
+    //
+    // NOTE: if the edge already exists, the existing edge weight
+    // is overwritten with the new edge weight.
+    //
     bool addEdge(VertexT from, VertexT to, WeightT weight)
     {
         auto it = this->vertices.find(from);
         if (it == this->vertices.end())
             return false; // Vertex not found, so return false
 
+        if (this->vertices.find(to) == this->vertices.end())
+            return false;
+
+        // If value is found replace with newer weight
+        auto found = it->second.neighbors.find(to);
+        if (found != it->second.neighbors.end())
+        {
+            found->second = weight;
+            return true;
+        }
         it->second.neighbors.emplace(to, weight);
         it->second.neighborsV.emplace(to);
-
         this->numEdges++;
-
         return true;
     }
 
+    //
+    // getWeight
+    //
+    // Returns the weight associated with a given edge.  If
+    // the edge exists, the weight is returned via the reference
+    // parameter and true is returned.  If the edge does not
+    // exist, the weight parameter is unchanged and false is
+    // returned.
+    //
     bool getWeight(VertexT from, VertexT to, WeightT &weight)
     {
         auto it = this->vertices.find(from);
         if (it == this->vertices.end())
+            return false;
+
+        if (this->vertices.count(to) == 0)
             return false;
 
         auto itInner = it->second.neighbors.find(to);
@@ -96,11 +133,28 @@ public:
         return true;
     }
 
-    std::set<VertexT> neighbors(VertexT v) const
+    //
+    // neighbors
+    //
+    // Returns a set containing the neighbors of v, i.e. all
+    // vertices that can be reached from v along one edge.
+    // Since a set is returned, the neighbors are returned in
+    // sorted order; use foreach to iterate through the set.
+    //
+    std::set<VertexT> neighbors(VertexT v)
     {
+        auto it = this->vertices.find(v);
+        if (it == this->vertices.end())
+            return std::set<VertexT>{};
         return this->vertices.find(v)->second.neighborsV;
     }
 
+    //
+    // getVertices
+    //
+    // Returns a vector containing all the vertices currently in
+    // the graph.
+    //
     std::vector<VertexT> getVertices()
     {
         std::vector<VertexT> v;
@@ -115,7 +169,7 @@ public:
     // Dumps the internal state of the graph for debugging purposes.
     //
     // Example:
-    //    Graph<string,int>  G(26);
+    //    graph<string,int> G();
     //    ...
     //    G.dump(std::cout);  // dump to console
     //
