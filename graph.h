@@ -1,6 +1,3 @@
-/*graph.h*/
-
-//
 // Ayaan Siddiqui
 //
 // Basic graph class using adjacency matrix representation.
