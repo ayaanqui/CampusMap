@@ -136,6 +136,28 @@ std::map<std::string, BuildingInfo>::iterator findBuilding(
     return buildings.find(query);
 }
 
+bool setBuildingInfo(
+    std::map<std::string, BuildingInfo> &buildingsAbbreviation,
+    std::map<std::string, BuildingInfo> &buildingsFullname,
+    BuildingInfo &buildingInfo,
+    std::string query)
+{
+    auto startIterAbbrev = findBuilding(buildingsAbbreviation, query);
+    if (startIterAbbrev == buildingsAbbreviation.end())
+    { // Abbreviation was not found, so we'll search for Fullname
+        auto startIterFname = findBuilding(buildingsFullname, query);
+        if (startIterFname != buildingsFullname.end())
+        {
+            buildingInfo = startIterFname->second;
+            return true;
+        }
+        else
+            return false;
+    }
+    buildingInfo = startIterAbbrev->second;
+    return true;
+}
+
 int main()
 {
     std::map<long long, Coordinates> Nodes; // maps a Node ID to it's coordinates (lat, lon)
@@ -200,31 +222,35 @@ int main()
     std::cout << "Enter start (partial name or abbreviation), or #> ";
     std::getline(std::cin, startBuilding);
 
+    BuildingInfo startBuildingInfo, destBuildingInfo;
+
     while (startBuilding != "#")
     {
         std::cout << "Enter destination (partial name or abbreviation)> ";
         std::getline(cin, destBuilding);
 
-        auto startIterAbbrev = findBuilding(buildingsAbbreviation, startBuilding);
-        auto startIterFname = findBuilding(buildingsFullname, startBuilding);
+        bool startFound = setBuildingInfo(buildingsAbbreviation, buildingsFullname, startBuildingInfo, startBuilding);
+        bool destFound = setBuildingInfo(buildingsAbbreviation, buildingsFullname, destBuildingInfo, destBuilding);
 
-        auto destIterAbbrev = findBuilding(buildingsAbbreviation, destBuilding);
-        auto destIterFname = findBuilding(buildingsFullname, destBuilding);
-
-        bool startFound = false;
-        bool destFound = false;
-
-        if (startIterAbbrev == buildingsAbbreviation.end() && startIterFname == buildingsFullname.end())
+        if (!startFound)
             std::cout << "Start building not found" << std::endl;
-        else
-            startFound = true;
-        if (destIterAbbrev == buildingsAbbreviation.end() && destIterFname == buildingsFullname.end())
+        if (!destFound)
             std::cout << "Destination building not found" << std::endl;
-        else
-            destFound = true;
 
         if (startFound && destFound)
-            std::cout << "Let's start Dijkstra's algorithm!!" << std::endl;
+        {
+            std::cout << "Starting point: " << std::endl;
+            std::cout << " " << startBuildingInfo.Fullname << std::endl;
+            std::cout << " (" << startBuildingInfo.Coords.Lat << ", " << startBuildingInfo.Coords.Lon << ")" << std::endl;
+            std::cout << std::endl;
+
+            std::cout << "Destination point: " << std::endl;
+            std::cout << " " << destBuildingInfo.Fullname << std::endl;
+            std::cout << " (" << destBuildingInfo.Coords.Lat << ", " << destBuildingInfo.Coords.Lon << ")" << std::endl;
+            std::cout << std::endl;
+
+            std::cout << "Dijkstra's algo features will be implemented soon..." << std::endl;
+        }
 
         // Restart...
         std::cout << std::endl;
