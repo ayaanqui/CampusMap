@@ -307,7 +307,20 @@ int main()
 
             std::cout << std::endl;
 
-            std::cout << "Dijkstra's algo features will be implemented soon..." << std::endl;
+            // Dijksra's algorithm...
+            std::cout << "Navigating with Dijkstra..." << std::endl;
+
+            std::map<long long, double> distances;
+            std::vector<long long> visitedNodes = Dijkstra(G, startCoord.ID, distances);
+            auto shortestPath = distances.find(destCoord.ID);
+
+            if (shortestPath == distances.end())
+                std::cout << "Sorry, destination unreachable" << std::endl;
+            else
+            {
+                std::cout << "Distance to dest: " << shortestPath->second << " miles" << std::endl;
+                std::cout << "Path: " << startCoord.ID << "->...->" << shortestPath->first << std::endl;
+            }
         }
 
         // Restart...
