@@ -55,7 +55,7 @@ std::vector<long long> Dijkstra(
         distances.emplace(vertex, (vertex == startV) ? 0 : INF);
     }
 
-    pair<double, long long> currentV;
+    std::pair<double, long long> currentV;
     double edgeWeight, altPathDistance;
 
     while (!unvisitedQueue.empty())
@@ -73,7 +73,7 @@ std::vector<long long> Dijkstra(
             visited.push_back(currentV.second);
         }
 
-        set<long long> neighbors = G.neighbors(currentV.second);
+        std::set<long long> neighbors = G.neighbors(currentV.second);
 
         for (auto neighbor : neighbors)
         {
