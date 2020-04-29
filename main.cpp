@@ -170,6 +170,33 @@ bool setBuildingInfo(
     return true;
 }
 
+Coordinates nearestNode(
+    std::vector<FootwayInfo> &Footways,
+    std::map<long long, Coordinates> &Nodes,
+    Coordinates &c)
+{
+    double dist = std::numeric_limits<double>::max();
+    Coordinates minDistCoord = c;
+
+    for (FootwayInfo &f : Footways)
+    {
+        for (long long id : f.Nodes)
+        {
+            std::map<long long, Coordinates>::iterator it = Nodes.find(id);
+            if (it != Nodes.end())
+            {
+                double dist2 = distBetween2Points(c.Lat, c.Lon, it->second.Lat, it->second.Lon);
+                if (dist2 < dist)
+                {
+                    dist = dist2;
+                    minDistCoord = it->second;
+                }
+            }
+        }
+    }
+    return minDistCoord;
+}
+
 int main()
 {
     std::map<long long, Coordinates> Nodes; // maps a Node ID to it's coordinates (lat, lon)
@@ -261,6 +288,19 @@ int main()
             std::cout << " (" << destBuildingInfo.Coords.Lat << ", " << destBuildingInfo.Coords.Lon << ")" << std::endl;
             std::cout << std::endl;
 
+            // Nearest nodes
+            Coordinates startCoord = nearestNode(Footways, Nodes, startBuildingInfo.Coords);
+            std::cout << "Nearest start node: " << std::endl;
+            std::cout << " " << startCoord.ID << std::endl;
+            std::cout << " (" << startCoord.Lat << ", " << startCoord.Lon << ")" << std::endl;
+            std::cout << std::endl;
+
+            Coordinates destCoord = nearestNode(Footways, Nodes, destBuildingInfo.Coords);
+            std::cout << "Nearest destination node: " << std::endl;
+            std::cout << " " << destCoord.ID << std::endl;
+            std::cout << " (" << destCoord.Lat << ", " << destCoord.Lon << ")" << std::endl;
+            std::cout << std::endl;
+
             std::cout << "Dijkstra's algo features will be implemented soon..." << std::endl;
         }
 
@@ -269,11 +309,6 @@ int main()
         std::cout << "Enter start (partial name or abbreviation), or #> ";
         std::getline(cin, startBuilding);
     }
-
-    //
-    // done:
-    //
     std::cout << "** Done **" << std::endl;
-
     return 0;
 }
