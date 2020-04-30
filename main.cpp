@@ -22,6 +22,7 @@
 #include <map>
 #include <set>
 #include <queue>
+#include <stack>
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
@@ -35,9 +36,10 @@
 std::vector<long long> Dijkstra(
     graph<long long, double> &G,
     long long startV,
+    long long destV,
     std::map<long long, double> &distances)
 {
-    const int INF = std::numeric_limits<int>::max();
+    const double INF = std::numeric_limits<double>::max();
 
     std::vector<long long> visited;
     std::set<long long> visitedSet;
@@ -63,15 +65,14 @@ std::vector<long long> Dijkstra(
         currentV = unvisitedQueue.top();
         unvisitedQueue.pop();
 
+        // Terminate loop if top equals destination
+        if (currentV.second == destV)
+            break;
+
         if (currentV.first == INF)
             break;
         else if (visitedSet.count(currentV.second) > 0)
             continue;
-        else
-        {
-            visitedSet.emplace(currentV.second);
-            visited.push_back(currentV.second);
-        }
 
         std::set<long long> neighbors = G.neighbors(currentV.second);
 
@@ -85,6 +86,8 @@ std::vector<long long> Dijkstra(
             {
                 unvisitedQueue.emplace(altPathDistance, neighbor);
                 distances[neighbor] = altPathDistance;
+                visited.push_back(currentV.second);
+                visitedSet.emplace(currentV.second);
             }
         }
     }
@@ -137,6 +140,20 @@ std::map<std::string, BuildingInfo>::iterator findBuilding(
     return buildings.find(query);
 }
 
+std::vector<std::string> splitStr(std::string x, char c)
+{
+    std::vector<std::string> res;
+    for (size_t i = 0; i < x.size(); ++i)
+    {
+        if (x[i] == c)
+        {
+            res.push_back(x.substr(0, i));
+            x = x.substr(i + 1);
+        }
+    }
+    return res;
+}
+
 bool setBuildingInfo(
     std::map<std::string, BuildingInfo> &buildingsAbbreviation,
     std::map<std::string, BuildingInfo> &buildingsFullname,
@@ -155,12 +172,20 @@ bool setBuildingInfo(
         else
         {
             // We will search for a partial match
+            std::vector<std::string> words = splitStr(query, ' ');
             for (auto iter : buildingsFullname)
             {
-                if (iter.first.find(query))
+                for (std::string w : words)
                 {
-                    buildingInfo = iter.second;
-                    return true;
+                    std::vector<std::string> splitName = splitStr(iter.second.Fullname, ' ');
+                    for (std::string sn : splitName)
+                    {
+                        if (w == sn)
+                        {
+                            buildingInfo = iter.second;
+                            return true;
+                        }
+                    }
                 }
             }
             return false;
@@ -207,6 +232,36 @@ void printNearestNode(Coordinates &coord)
 {
     std::cout << " " << coord.ID << std::endl;
     std::cout << " (" << coord.Lat << ", " << coord.Lon << ")" << std::endl;
+}
+
+std::stack<long long> getPath(
+    graph<long long, double> &G,
+    std::vector<long long> &nodes,
+    long long start, long long dest)
+{
+    std::stack<long long> shortestPath;
+    std::set<long long> visitedNodes;
+    shortestPath.push(dest);
+
+    while (shortestPath.top() != start)
+    {
+        std::queue<long long> S;
+        for (long long vert : nodes)
+        {
+            double weight = 0.0;
+            if (visitedNodes.count(vert) == 0 && G.getWeight(vert, shortestPath.top(), weight))
+            {
+                S.push(vert);
+                visitedNodes.insert(vert);
+            }
+        }
+
+        if (!S.empty())
+            shortestPath.push(S.front());
+        else
+            break;
+    }
+    return shortestPath;
 }
 
 int main()
@@ -284,9 +339,9 @@ int main()
         bool destFound = setBuildingInfo(buildingsAbbreviation, buildingsFullname, destBuildingInfo, destBuilding);
 
         if (!startFound)
-            std::cout << "Start building not found" << std::endl;
+            std::cout << "Start building not found..." << std::endl;
         if (!destFound)
-            std::cout << "Destination building not found" << std::endl;
+            std::cout << "Destination building not found..." << std::endl;
 
         if (startFound && destFound)
         {
@@ -311,15 +366,25 @@ int main()
             std::cout << "Navigating with Dijkstra..." << std::endl;
 
             std::map<long long, double> distances;
-            std::vector<long long> visitedNodes = Dijkstra(G, startCoord.ID, distances);
-            auto shortestPath = distances.find(destCoord.ID);
+            std::vector<long long> nodes = Dijkstra(G, startCoord.ID, destCoord.ID, distances);
 
-            if (shortestPath == distances.end())
+            auto shortestPath = getPath(G, nodes, startCoord.ID, destCoord.ID);
+
+            if (shortestPath.top() == destCoord.ID)
                 std::cout << "Sorry, destination unreachable" << std::endl;
             else
             {
-                std::cout << "Distance to dest: " << shortestPath->second << " miles" << std::endl;
-                std::cout << "Path: " << startCoord.ID << "->...->" << shortestPath->first << std::endl;
+                std::cout << "Distance to dest: " << distances.find(destCoord.ID)->second << " miles" << std::endl;
+
+                std::cout << "Path: ";
+                while (!shortestPath.empty())
+                {
+                    std::cout << shortestPath.top();
+                    if (shortestPath.top() != destCoord.ID)
+                        std::cout << "->";
+                    shortestPath.pop();
+                }
+                std::cout << std::endl;
             }
         }
 
