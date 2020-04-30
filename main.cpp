@@ -140,9 +140,15 @@ std::map<std::string, BuildingInfo>::iterator findBuilding(
     return buildings.find(query);
 }
 
+/**
+ * Given a string and a char
+ * splitStr returns an array of with strings seperated by c
+ * Ex. "This is a text" -> ["This", "is", "a", "text"]
+ */
 std::vector<std::string> splitStr(std::string x, char c)
 {
     std::vector<std::string> res;
+
     for (size_t i = 0; i < x.size(); ++i)
     {
         if (x[i] == c)
@@ -151,6 +157,7 @@ std::vector<std::string> splitStr(std::string x, char c)
             x = x.substr(i + 1);
         }
     }
+    res.push_back(x); // Pushes the last item
     return res;
 }
 
@@ -173,6 +180,7 @@ bool setBuildingInfo(
         {
             // We will search for a partial match
             std::vector<std::string> words = splitStr(query, ' ');
+
             for (auto iter : buildingsFullname)
             {
                 for (std::string w : words)
@@ -195,6 +203,10 @@ bool setBuildingInfo(
     return true;
 }
 
+/**
+ * nearestNode loops through all Nodes in a given FootwayInfo vector
+ * and finds the closest node to c
+ */
 Coordinates nearestNode(
     std::vector<FootwayInfo> &Footways,
     std::map<long long, Coordinates> &Nodes,
@@ -234,7 +246,12 @@ void printNearestNode(Coordinates &coord)
     std::cout << " (" << coord.Lat << ", " << coord.Lon << ")" << std::endl;
 }
 
-std::stack<long long> getPath(
+/**
+ * Given all visited nodes from start to destination
+ * tracePath traces all paths from the destination to 
+ * the starting node
+ */
+std::stack<long long> tracePath(
     graph<long long, double> &G,
     std::vector<long long> &nodes,
     long long start, long long dest)
@@ -368,7 +385,7 @@ int main()
             std::map<long long, double> distances;
             std::vector<long long> nodes = Dijkstra(G, startCoord.ID, destCoord.ID, distances);
 
-            auto shortestPath = getPath(G, nodes, startCoord.ID, destCoord.ID);
+            auto shortestPath = tracePath(G, nodes, startCoord.ID, destCoord.ID);
 
             if (shortestPath.top() == destCoord.ID)
                 std::cout << "Sorry, destination unreachable" << std::endl;
@@ -377,6 +394,7 @@ int main()
                 std::cout << "Distance to dest: " << distances.find(destCoord.ID)->second << " miles" << std::endl;
 
                 std::cout << "Path: ";
+                // Print all nodes from start to dest
                 while (!shortestPath.empty())
                 {
                     std::cout << shortestPath.top();
