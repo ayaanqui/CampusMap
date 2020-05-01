@@ -52,7 +52,7 @@ std::vector<VertexT> Dijkstra(
         std::greater<std::pair<WeightT, VertexT>>>
         unvisitedQueue;
 
-    for (long long &vertex : graphVertices)
+    for (VertexT &vertex : graphVertices)
     {
         unvisitedQueue.push(std::make_pair(INF, vertex));
         distances.emplace(vertex, INF);
