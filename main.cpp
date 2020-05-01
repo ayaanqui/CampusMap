@@ -33,32 +33,36 @@
 #include "osm.h"
 #include "graph.h" // Graph implementation
 
-std::vector<long long> Dijkstra(
-    graph<long long, double> &G,
-    long long startV,
-    long long destV,
-    std::map<long long, double> &distances)
+template <typename VertexT, typename WeightT>
+std::vector<VertexT> Dijkstra(
+    graph<VertexT, WeightT> &G,
+    VertexT startV,
+    VertexT destV,
+    std::map<VertexT, WeightT> &distances)
 {
-    const double INF = std::numeric_limits<double>::max();
+    const WeightT INF = std::numeric_limits<WeightT>::max();
 
-    std::vector<long long> visited;
-    std::set<long long> visitedSet;
+    std::vector<VertexT> visited;
+    std::set<VertexT> visitedSet;
 
-    std::vector<long long> graphVertices = G.getVertices();
+    std::vector<VertexT> graphVertices = G.getVertices();
     std::priority_queue<
-        std::pair<double, long long>,
-        std::vector<std::pair<double, long long>>,
-        std::greater<std::pair<double, long long>>>
+        std::pair<WeightT, VertexT>,
+        std::vector<std::pair<WeightT, VertexT>>,
+        std::greater<std::pair<WeightT, VertexT>>>
         unvisitedQueue;
 
     for (long long vertex : graphVertices)
     {
-        unvisitedQueue.emplace((vertex == startV) ? 0 : INF, vertex);
-        distances.emplace(vertex, (vertex == startV) ? 0 : INF);
+        unvisitedQueue.emplace(INF, vertex);
+        distances.emplace(vertex, INF);
     }
 
-    std::pair<double, long long> currentV;
-    double edgeWeight, altPathDistance;
+    unvisitedQueue.push(std::make_pair(0, startV));
+    distances[startV] = 0;
+
+    std::pair<WeightT, VertexT> currentV;
+    WeightT edgeWeight, altPathDistance;
 
     while (!unvisitedQueue.empty())
     {
@@ -73,8 +77,13 @@ std::vector<long long> Dijkstra(
             break;
         else if (visitedSet.count(currentV.second) > 0)
             continue;
+        else
+        {
+            visited.push_back(currentV.second);
+            visitedSet.emplace(currentV.second);
+        }
 
-        std::set<long long> neighbors = G.neighbors(currentV.second);
+        std::set<VertexT> neighbors = G.neighbors(currentV.second);
 
         for (auto neighbor : neighbors)
         {
@@ -86,8 +95,6 @@ std::vector<long long> Dijkstra(
             {
                 unvisitedQueue.emplace(altPathDistance, neighbor);
                 distances[neighbor] = altPathDistance;
-                visited.push_back(currentV.second);
-                visitedSet.emplace(currentV.second);
             }
         }
     }
@@ -106,17 +113,12 @@ void addEdges(std::vector<FootwayInfo> &Footways, std::map<long long, Coordinate
     {
         for (size_t i = 0; i < footway.Nodes.size() - 1; ++i)
         {
-            auto node1 = Nodes.find(footway.Nodes[i]);
-            auto node2 = Nodes.find(footway.Nodes[i + 1]);
+            auto n1 = Nodes.find(footway.Nodes[i]);
+            auto n2 = Nodes.find(footway.Nodes[i + 1]);
 
-            G.addEdge(
-                node1->first,
-                node2->first,
-                distBetween2Points(node1->second.Lat, node1->second.Lon, node2->second.Lat, node2->second.Lon));
-            G.addEdge(
-                node2->first,
-                node1->first,
-                distBetween2Points(node2->second.Lat, node2->second.Lon, node1->second.Lat, node1->second.Lon));
+            double dist = distBetween2Points(n1->second.Lat, n1->second.Lon, n2->second.Lat, n2->second.Lon);
+            G.addEdge(n1->first, n2->first, dist);
+            G.addEdge(n2->first, n1->first, dist);
         }
     }
 }
@@ -383,7 +385,7 @@ int main()
             std::cout << "Navigating with Dijkstra..." << std::endl;
 
             std::map<long long, double> distances;
-            std::vector<long long> nodes = Dijkstra(G, startCoord.ID, destCoord.ID, distances);
+            std::vector<long long> nodes = Dijkstra<long long, double>(G, startCoord.ID, destCoord.ID, distances);
 
             auto shortestPath = tracePath(G, nodes, startCoord.ID, destCoord.ID);
 
