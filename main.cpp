@@ -37,8 +37,8 @@ template <typename VertexT, typename WeightT>
 std::vector<VertexT> Dijkstra(
     graph<VertexT, WeightT> &G,
     VertexT startV,
-    VertexT destV,
-    std::map<VertexT, WeightT> &distances)
+    std::map<VertexT, WeightT> &distances,
+    std::map<VertexT, VertexT> &pred)
 {
     const WeightT INF = std::numeric_limits<WeightT>::max();
 
@@ -52,10 +52,11 @@ std::vector<VertexT> Dijkstra(
         std::greater<std::pair<WeightT, VertexT>>>
         unvisitedQueue;
 
-    for (long long vertex : graphVertices)
+    for (long long &vertex : graphVertices)
     {
-        unvisitedQueue.emplace(INF, vertex);
+        unvisitedQueue.push(std::make_pair(INF, vertex));
         distances.emplace(vertex, INF);
+        pred.emplace(vertex, 0);
     }
 
     unvisitedQueue.push(std::make_pair(0, startV));
@@ -69,10 +70,6 @@ std::vector<VertexT> Dijkstra(
         currentV = unvisitedQueue.top();
         unvisitedQueue.pop();
 
-        // Terminate loop if top equals destination
-        if (currentV.second == destV)
-            break;
-
         if (currentV.first == INF)
             break;
         else if (visitedSet.count(currentV.second) > 0)
@@ -85,16 +82,19 @@ std::vector<VertexT> Dijkstra(
 
         std::set<VertexT> neighbors = G.neighbors(currentV.second);
 
-        for (auto neighbor : neighbors)
+        for (VertexT neighbor : neighbors)
         {
             edgeWeight = 0.0;
             G.getWeight(currentV.second, neighbor, edgeWeight);
             altPathDistance = currentV.first + edgeWeight;
 
-            if (altPathDistance < distances.find(neighbor)->second)
+            auto distancesIt = distances.find(neighbor);
+            if (altPathDistance < distancesIt->second)
             {
                 unvisitedQueue.emplace(altPathDistance, neighbor);
-                distances[neighbor] = altPathDistance;
+                distancesIt->second = altPathDistance;
+                edgeWeight = altPathDistance;
+                pred[neighbor] = currentV.second;
             }
         }
     }
@@ -253,32 +253,16 @@ void printNearestNode(Coordinates &coord)
  * tracePath traces all paths from the destination to 
  * the starting node
  */
-std::stack<long long> tracePath(
-    graph<long long, double> &G,
-    std::vector<long long> &nodes,
-    long long start, long long dest)
+std::stack<long long> tracePath(std::map<long long, long long> &pred, long long dest)
 {
     std::stack<long long> shortestPath;
-    std::set<long long> visitedNodes;
+    long long end = pred.find(dest)->second;
     shortestPath.push(dest);
 
-    while (shortestPath.top() != start)
+    while (end != 0)
     {
-        std::queue<long long> S;
-        for (long long vert : nodes)
-        {
-            double weight = 0.0;
-            if (visitedNodes.count(vert) == 0 && G.getWeight(vert, shortestPath.top(), weight))
-            {
-                S.push(vert);
-                visitedNodes.insert(vert);
-            }
-        }
-
-        if (!S.empty())
-            shortestPath.push(S.front());
-        else
-            break;
+        shortestPath.push(end);
+        end = pred.find(end)->second;
     }
     return shortestPath;
 }
@@ -359,7 +343,7 @@ int main()
 
         if (!startFound)
             std::cout << "Start building not found..." << std::endl;
-        if (!destFound)
+        else if (!destFound)
             std::cout << "Destination building not found..." << std::endl;
 
         if (startFound && destFound)
@@ -385,14 +369,16 @@ int main()
             std::cout << "Navigating with Dijkstra..." << std::endl;
 
             std::map<long long, double> distances;
-            std::vector<long long> nodes = Dijkstra<long long, double>(G, startCoord.ID, destCoord.ID, distances);
+            std::map<long long, long long> pred;
+            std::vector<long long> nodes = Dijkstra<long long, double>(G, startCoord.ID, distances, pred);
 
-            auto shortestPath = tracePath(G, nodes, startCoord.ID, destCoord.ID);
+            auto shortestPath = tracePath(pred, destCoord.ID);
 
             if (shortestPath.top() == destCoord.ID)
                 std::cout << "Sorry, destination unreachable" << std::endl;
             else
             {
+                // std::cout << std::setprecision(8);
                 std::cout << "Distance to dest: " << distances.find(destCoord.ID)->second << " miles" << std::endl;
 
                 std::cout << "Path: ";
