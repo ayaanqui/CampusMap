@@ -27,6 +27,7 @@
 #include <cstring>
 #include <cassert>
 #include <limits>
+#include <sstream>
 
 #include "tinyxml2.h"
 #include "dist.h"
@@ -149,18 +150,13 @@ std::map<std::string, BuildingInfo>::iterator findBuilding(
  */
 std::vector<std::string> splitStr(std::string x, char c)
 {
-    std::vector<std::string> res;
+    std::stringstream ss(x);
+    std::string item;
+    std::vector<std::string> splittedStrings;
 
-    for (size_t i = 0; i < x.size(); ++i)
-    {
-        if (x[i] == c)
-        {
-            res.push_back(x.substr(0, i));
-            x = x.substr(i + 1);
-        }
-    }
-    res.push_back(x); // Pushes the last item
-    return res;
+    while (std::getline(ss, item, c))
+        splittedStrings.push_back(item);
+    return splittedStrings;
 }
 
 bool setBuildingInfo(
@@ -253,9 +249,13 @@ void printNearestNode(Coordinates &coord)
  * tracePath traces all paths from the destination to 
  * the starting node
  */
-std::stack<long long> tracePath(std::map<long long, long long> &pred, long long dest)
+std::stack<long long> tracePath(std::map<long long, long long> &pred, long long start, long long dest)
 {
     std::stack<long long> shortestPath;
+    // Return empty stack if
+    if (start == dest)
+        return shortestPath;
+
     long long end = pred.find(dest)->second;
     shortestPath.push(dest);
 
@@ -342,9 +342,9 @@ int main()
         bool destFound = setBuildingInfo(buildingsAbbreviation, buildingsFullname, destBuildingInfo, destBuilding);
 
         if (!startFound)
-            std::cout << "Start building not found..." << std::endl;
+            std::cout << "Start building not found" << std::endl;
         else if (!destFound)
-            std::cout << "Destination building not found..." << std::endl;
+            std::cout << "Destination building not found" << std::endl;
 
         if (startFound && destFound)
         {
@@ -372,9 +372,14 @@ int main()
             std::map<long long, long long> pred;
             std::vector<long long> nodes = Dijkstra<long long, double>(G, startCoord.ID, distances, pred);
 
-            auto shortestPath = tracePath(pred, destCoord.ID);
+            auto shortestPath = tracePath(pred, startCoord.ID, destCoord.ID);
 
-            if (shortestPath.top() == destCoord.ID)
+            if (shortestPath.empty())
+            {
+                std::cout << "Distance to dest: 0 miles" << std::endl;
+                std::cout << "Path: " << startCoord.ID << std::endl;
+            }
+            else if (shortestPath.top() == destCoord.ID)
                 std::cout << "Sorry, destination unreachable" << std::endl;
             else
             {
