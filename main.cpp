@@ -383,7 +383,6 @@ int main()
                 std::cout << "Sorry, destination unreachable" << std::endl;
             else
             {
-                // std::cout << std::setprecision(8);
                 std::cout << "Distance to dest: " << distances.find(destCoord.ID)->second << " miles" << std::endl;
 
                 std::cout << "Path: ";
